@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Gestor" />
+  <title>Gestor Imobiliário</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">GI</div>
+        <div>
+          <strong>Gestor Imobiliário</strong>
+          <small>CRM pessoal</small>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Navegação principal">
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="properties">Imóveis</button>
+        <button class="nav-item" data-view="clients">Clientes</button>
+        <button class="nav-item" data-view="processes">Processos</button>
+        <button class="nav-item" data-view="agenda">Agenda</button>
+        <button class="nav-item" data-view="commissions">Comissões</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="ghost" id="exportBtn">Exportar dados</button>
+        <label class="ghost file-label">Importar dados<input id="importInput" type="file" accept="application/json" hidden /></label>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">☰</button>
+        <div><h1 id="pageTitle">Dashboard</h1><p id="pageSubtitle">Visão geral da operação</p></div>
+        <button class="primary" id="quickAddBtn">+ Adicionar</button>
+      </header>
+      <section class="view active" id="dashboardView">
+        <div class="stats-grid">
+          <article class="stat-card"><span>Imóveis ativos</span><strong id="statActiveProperties">0</strong><small>Em comercialização</small></article>
+          <article class="stat-card"><span>Próximos compromissos</span><strong id="statUpcoming">0</strong><small>Nos próximos 7 dias</small></article>
+          <article class="stat-card"><span>Processos em curso</span><strong id="statProcesses">0</strong><small>CPCV, avaliação ou escritura</small></article>
+          <article class="stat-card"><span>Comissões previstas</span><strong id="statCommission">0 €</strong><small>Por receber</small></article>
+        </div>
+        <div class="dashboard-grid">
+          <article class="panel"><div class="panel-head"><div><h2>Prioridades</h2><p>Próximas ações por data</p></div></div><div id="priorityList" class="list"></div></article>
+          <article class="panel"><div class="panel-head"><div><h2>Pipeline</h2><p>Distribuição dos processos</p></div></div><div id="pipelineList" class="pipeline"></div></article>
+        </div>
+      </section>
+      <section class="view" id="propertiesView"><div class="section-toolbar"><input class="search" id="propertySearch" placeholder="Pesquisar imóvel, proprietário ou zona…" /><button class="primary" data-open-modal="property">+ Novo imóvel</button></div><div class="table-wrap"><table><thead><tr><th>Imóvel</th><th>Proprietário</th><th>Preço</th><th>Estado</th><th>Próxima ação</th><th></th></tr></thead><tbody id="propertiesTable"></tbody></table></div></section>
+      <section class="view" id="clientsView"><div class="section-toolbar"><input class="search" id="clientSearch" placeholder="Pesquisar cliente…" /><button class="primary" data-open-modal="client">+ Novo cliente</button></div><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Tipo</th><th>Telefone</th><th>Email</th><th>Notas</th><th></th></tr></thead><tbody id="clientsTable"></tbody></table></div></section>
+      <section class="view" id="processesView"><div class="section-toolbar"><div><h2>Pipeline de negócio</h2><p>Do acompanhamento à escritura</p></div><button class="primary" data-open-modal="process">+ Novo processo</button></div><div class="kanban" id="processBoard"></div></section>
+      <section class="view" id="agendaView"><div class="section-toolbar"><div><h2>Agenda</h2><p>Visitas, chamadas, CPCV, avaliações e escrituras</p></div><button class="primary" data-open-modal="agenda">+ Novo compromisso</button></div><div id="agendaList" class="agenda-list"></div></section>
+      <section class="view" id="commissionsView"><div class="section-toolbar"><div><h2>Comissões</h2><p>Previsto, recebido e pendente</p></div><button class="primary" data-open-modal="commission">+ Nova comissão</button></div><div class="stats-grid compact"><article class="stat-card"><span>Total previsto</span><strong id="commissionExpected">0 €</strong></article><article class="stat-card"><span>Recebido</span><strong id="commissionReceived">0 €</strong></article><article class="stat-card"><span>Pendente</span><strong id="commissionPending">0 €</strong></article></div><div class="table-wrap"><table><thead><tr><th>Negócio</th><th>Valor</th><th>Estado</th><th>Data prevista</th><th></th></tr></thead><tbody id="commissionsTable"></tbody></table></div></section>
+    </main>
+  </div>
+  <dialog id="entityModal"><form method="dialog" id="entityForm"><div class="modal-head"><div><h2 id="modalTitle">Adicionar</h2><p id="modalSubtitle"></p></div><button type="button" class="icon-btn" id="closeModal">×</button></div><div id="formFields" class="form-grid"></div><div class="modal-actions"><button type="button" class="secondary" id="cancelModal">Cancelar</button><button class="primary" type="submit">Guardar</button></div></form></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));}</script>
+</body>
+</html>
