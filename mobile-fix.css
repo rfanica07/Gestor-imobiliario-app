@@ -1,0 +1,26 @@
+@media (max-width:760px){
+  html,body{min-height:100%;}
+  body{padding:0;}
+  .app-shell{min-height:100dvh;}
+  .main{padding:0 14px calc(38px + env(safe-area-inset-bottom,0px));}
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:20;
+    margin:0 -14px 18px;
+    padding:calc(10px + env(safe-area-inset-top,0px)) 14px 12px;
+    background:rgba(248,250,252,.96);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(226,232,240,.9);
+  }
+  .menu-btn{display:grid;place-items:center;min-width:46px;min-height:46px;padding:0;font-size:22px;flex:0 0 46px;}
+  .topbar .primary{min-height:46px;white-space:nowrap;}
+  .sidebar{
+    top:0;
+    height:100dvh;
+    overflow-y:auto;
+    padding-top:calc(24px + env(safe-area-inset-top,0px));
+    padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  }
+}
