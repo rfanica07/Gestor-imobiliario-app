@@ -107,13 +107,22 @@ $('#entityForm').addEventListener('submit',e=>{
   ['price','value','amount'].forEach(k=>{if(k in data)data[k]=Number(data[k]||0)});
   const key=collectionFor(editing.type);
   const collection=state[key];
+  const savedEditingId=editing.id;
   if(editing.id){
     const idx=collection.findIndex(x=>x.id===editing.id);
-    collection[idx]={...collection[idx],...data};
+    const current=collection[idx] || {};
+    if(editing.type==='property'){
+      ['nextActionType','nextActionDetail','nextAction','nextActionTime'].forEach(k=>{
+        if((data[k]===undefined || data[k]==='') && current[k]) data[k]=current[k];
+      });
+    }
+    collection[idx]={...current,...data};
   } else {
     collection.unshift({id:uid(),createdAt:new Date().toISOString(),...data});
   }
-  saveState(); closeModal(); showToast(editing.id?'Alterações guardadas':'Guardado com sucesso');
+  saveState();
+  closeModal();
+  showToast(savedEditingId?'Alterações guardadas':'Guardado com sucesso');
 });
 
 function deleteItem(type,id){
@@ -130,10 +139,11 @@ function statusBadge(status){
   return `<span class="badge ${cls}">${escapeHTML(status||'—')}</span>`;
 }
 function emptyRow(cols,text='Ainda não há registos.') { return `<tr><td colspan="${cols}" class="empty">${text}</td></tr>`; }
+function hasPropertyAction(x){ return Boolean(x.nextAction || x.nextActionType || x.nextActionDetail || x.nextActionTime); }
 function propertyAction(x){
-  if(!x.nextAction && !x.nextActionType && !x.nextActionDetail) return '—';
-  const line=[x.nextActionType,dateFmt(x.nextAction),x.nextActionTime].filter(Boolean).join(' · ');
-  return `<strong>${escapeHTML(line || 'Próxima ação')}</strong>${x.nextActionDetail?`<br><small>${escapeHTML(x.nextActionDetail)}</small>`:''}`;
+  if(!hasPropertyAction(x)) return '<span class="muted-action">Sem ação definida</span>';
+  const line=[x.nextActionType || 'Próxima ação',x.nextAction ? dateFmt(x.nextAction) : '',x.nextActionTime].filter(Boolean).join(' · ');
+  return `<strong>${escapeHTML(line)}</strong>${x.nextActionDetail?`<br><small>${escapeHTML(x.nextActionDetail)}</small>`:''}`;
 }
 
 function renderProperties(){
@@ -202,10 +212,15 @@ function renderDashboard(){
 
   const priorities=[
     ...state.agenda.map(x=>({date:x.date,title:x.title,detail:`${x.type}${x.time?` · ${x.time}`:''}${x.location?` · ${x.location}`:''}`})),
-    ...state.properties.filter(x=>x.nextAction).map(x=>({date:x.nextAction,title:x.title,detail:`${x.nextActionType||'Próxima ação'}${x.nextActionTime?` · ${x.nextActionTime}`:''}${x.nextActionDetail?` · ${x.nextActionDetail}`:''}`})),
+    ...state.properties.filter(hasPropertyAction).map(x=>({date:x.nextAction||'',title:x.title,detail:`${x.nextActionType||'Próxima ação'}${x.nextActionTime?` · ${x.nextActionTime}`:''}${x.nextActionDetail?` · ${x.nextActionDetail}`:''}`})),
     ...state.processes.filter(x=>x.date&&x.stage!=='Concluído').map(x=>({date:x.date,title:x.title,detail:`${x.stage}${x.client?` · ${x.client}`:''}`}))
-  ].filter(x=>x.date).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,10);
-  $('#priorityList').innerHTML=priorities.length?priorities.map(x=>`<div class="list-item"><div class="list-main"><strong>${escapeHTML(x.title)}</strong><small>${escapeHTML(x.detail)}</small></div><span class="badge">${dateFmt(x.date)}</span></div>`).join(''):'<div class="empty">Sem prioridades marcadas. Adiciona uma data a um imóvel, processo ou compromisso.</div>';
+  ].sort((a,b)=>{
+    if(a.date && b.date) return a.date.localeCompare(b.date);
+    if(a.date) return -1;
+    if(b.date) return 1;
+    return a.title.localeCompare(b.title,'pt');
+  }).slice(0,10);
+  $('#priorityList').innerHTML=priorities.length?priorities.map(x=>`<div class="list-item"><div class="list-main"><strong>${escapeHTML(x.title)}</strong><small>${escapeHTML(x.detail)}</small></div><span class="badge">${x.date?dateFmt(x.date):'Sem data'}</span></div>`).join(''):'<div class="empty">Sem prioridades marcadas. Define uma próxima ação num imóvel, processo ou compromisso.</div>';
 
   const counts=stages.map(stage=>[stage,state.processes.filter(x=>x.stage===stage).length]);
   const max=Math.max(1,...counts.map(x=>x[1]));
