@@ -11,7 +11,7 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="mobile-fix.css?v=2" />
+  <link rel="stylesheet" href="mobile-fix.css?v=3" />
 </head>
 <body>
   <div class="app-shell">
@@ -36,12 +36,14 @@
         <label class="ghost file-label">Importar dados<input id="importInput" type="file" accept="application/json" hidden /></label>
       </div>
     </aside>
+
     <main class="main">
       <header class="topbar">
         <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">☰</button>
         <div><h1 id="pageTitle">Dashboard</h1><p id="pageSubtitle">Visão geral da operação</p></div>
-        <button class="primary" id="quickAddBtn">+ Adicionar</button>
+        <button class="primary" id="quickAddBtn">+ Novo imóvel</button>
       </header>
+
       <section class="view active" id="dashboardView">
         <div class="stats-grid">
           <article class="stat-card"><span>Imóveis ativos</span><strong id="statActiveProperties">0</strong><small>Em comercialização</small></article>
@@ -54,16 +56,38 @@
           <article class="panel"><div class="panel-head"><div><h2>Pipeline</h2><p>Distribuição dos processos</p></div></div><div id="pipelineList" class="pipeline"></div></article>
         </div>
       </section>
-      <section class="view" id="propertiesView"><div class="section-toolbar"><input class="search" id="propertySearch" placeholder="Pesquisar imóvel, proprietário ou zona…" /><button class="primary" data-open-modal="property">+ Novo imóvel</button></div><div class="table-wrap"><table><thead><tr><th>Imóvel</th><th>Proprietário</th><th>Preço</th><th>Estado</th><th>Próxima ação</th><th></th></tr></thead><tbody id="propertiesTable"></tbody></table></div></section>
-      <section class="view" id="clientsView"><div class="section-toolbar"><input class="search" id="clientSearch" placeholder="Pesquisar cliente…" /><button class="primary" data-open-modal="client">+ Novo cliente</button></div><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Tipo</th><th>Telefone</th><th>Email</th><th>Notas</th><th></th></tr></thead><tbody id="clientsTable"></tbody></table></div></section>
-      <section class="view" id="processesView"><div class="section-toolbar"><div><h2>Pipeline de negócio</h2><p>Do acompanhamento à escritura</p></div><button class="primary" data-open-modal="process">+ Novo processo</button></div><div class="kanban" id="processBoard"></div></section>
-      <section class="view" id="agendaView"><div class="section-toolbar"><div><h2>Agenda</h2><p>Visitas, chamadas, CPCV, avaliações e escrituras</p></div><button class="primary" data-open-modal="agenda">+ Novo compromisso</button></div><div id="agendaList" class="agenda-list"></div></section>
-      <section class="view" id="commissionsView"><div class="section-toolbar"><div><h2>Comissões</h2><p>Previsto, recebido e pendente</p></div><button class="primary" data-open-modal="commission">+ Nova comissão</button></div><div class="stats-grid compact"><article class="stat-card"><span>Total previsto</span><strong id="commissionExpected">0 €</strong></article><article class="stat-card"><span>Recebido</span><strong id="commissionReceived">0 €</strong></article><article class="stat-card"><span>Pendente</span><strong id="commissionPending">0 €</strong></article></div><div class="table-wrap"><table><thead><tr><th>Negócio</th><th>Valor</th><th>Estado</th><th>Data prevista</th><th></th></tr></thead><tbody id="commissionsTable"></tbody></table></div></section>
+
+      <section class="view" id="propertiesView">
+        <div class="section-toolbar"><input class="search" id="propertySearch" placeholder="Pesquisar imóvel, proprietário ou zona…" /></div>
+        <div class="table-wrap"><table><thead><tr><th>Imóvel</th><th>Proprietário</th><th>Preço</th><th>Estado</th><th>Próxima ação</th><th></th></tr></thead><tbody id="propertiesTable"></tbody></table></div>
+      </section>
+
+      <section class="view" id="clientsView">
+        <div class="section-toolbar"><input class="search" id="clientSearch" placeholder="Pesquisar cliente…" /></div>
+        <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Tipo</th><th>Telefone</th><th>Email</th><th>Notas</th><th></th></tr></thead><tbody id="clientsTable"></tbody></table></div>
+      </section>
+
+      <section class="view" id="processesView">
+        <div class="section-toolbar"><div><h2>Pipeline de negócio</h2><p>Do acompanhamento à escritura</p></div></div>
+        <div class="kanban" id="processBoard"></div>
+      </section>
+
+      <section class="view" id="agendaView">
+        <div class="section-toolbar"><div><h2>Agenda</h2><p>Visitas, chamadas, CPCV, avaliações e escrituras</p></div></div>
+        <div id="agendaList" class="agenda-list"></div>
+      </section>
+
+      <section class="view" id="commissionsView">
+        <div class="section-toolbar"><div><h2>Comissões</h2><p>Previsto, recebido e pendente</p></div></div>
+        <div class="stats-grid compact"><article class="stat-card"><span>Total previsto</span><strong id="commissionExpected">0 €</strong></article><article class="stat-card"><span>Recebido</span><strong id="commissionReceived">0 €</strong></article><article class="stat-card"><span>Pendente</span><strong id="commissionPending">0 €</strong></article></div>
+        <div class="table-wrap"><table><thead><tr><th>Negócio</th><th>Valor</th><th>Estado</th><th>Data prevista</th><th></th></tr></thead><tbody id="commissionsTable"></tbody></table></div>
+      </section>
     </main>
   </div>
+
   <dialog id="entityModal"><form method="dialog" id="entityForm"><div class="modal-head"><div><h2 id="modalTitle">Adicionar</h2><p id="modalSubtitle"></p></div><button type="button" class="icon-btn" id="closeModal">×</button></div><div id="formFields" class="form-grid"></div><div class="modal-actions"><button type="button" class="secondary" id="cancelModal">Cancelar</button><button class="primary" type="submit">Guardar</button></div></form></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
   <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));}</script>
 </body>
 </html>
